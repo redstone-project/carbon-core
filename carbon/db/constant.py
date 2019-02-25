@@ -14,6 +14,15 @@
 """
 
 
+# noinspection PyPep8Naming
+class JOB_TYPE:
+    # jobs中的job_type字段使用
+    # ONCE: 一次性扫描任务
+    # DAILY: 日常扫描任务，任务完成后会重新生成任务压入到队列中
+    ONCE = 0x01
+    DAILY = 0x02
+
+
 class PROTOCOL:
     TCP = "TCP"
     UDP = "UDP"
