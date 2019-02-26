@@ -27,6 +27,7 @@ class CarbonPortsModel(CarbonBaseModel):
     """
     存储端口扫描的结果
 
+    task_id: 记录是哪个扫描任务发现的该端口，需要关联到任务信息
     host: 主机
     port_number: 开放的端口号
     protocol: 协议，TCP、UDP
@@ -36,9 +37,9 @@ class CarbonPortsModel(CarbonBaseModel):
     class Meta:
         db_table = "carbon_ports"
 
-    # task_id，记录是哪个扫描任务发现的该端口，需要关联到任务信息
-    host = models.CharField(max_length=16, default="255.255.255.255")
-    port_number = models.IntegerField(default=0)
+    task_id = models.BigIntegerField(default=0)
+    host = models.CharField(max_length=16, default="255.255.255.255", db_index=True)
+    port_number = models.IntegerField(default=0, db_index=True)
     protocol = models.CharField(max_length=4, default="null")
     raw_banner = models.TextField()
     service = models.TextField()

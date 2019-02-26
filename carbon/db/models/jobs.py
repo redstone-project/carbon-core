@@ -35,14 +35,18 @@ class CarbonJobsModel(CarbonBaseModel):
                 - 一次性任务：只执行一次，用于正常扫描
                 - 日常任务：一旦完成扫描，马上产生一个相同的任务压入队列中
     payloads: 用户输入的内容，一个目标一行，会自动产生多个task插入表中
-    interval: 周期性任务的间隔
+    status: job的运行状态，日常任务除非手工停止，否则一直处于Running状态
+            - 0x00 Ready
+            - 0x01 Running
+            - 0x02 Finished
+            - 0x03 Error
     """
     class Meta:
         db_table = "carbon_jobs"
 
-    job_type = models.CharField(max_length=16, default="null")
+    job_type = models.IntegerField(default=0)
     payloads = models.TextField()
-    interval = models.IntegerField(default=1)
+    status = models.IntegerField(default=0)
 
     objects = models.Manager()
     instance = JobManager()
