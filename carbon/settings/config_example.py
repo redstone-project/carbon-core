@@ -18,13 +18,20 @@ SECRET_KEY = ""     # 推荐使用该方法生成：base64.b64encode(os.urandom(
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 CSRF_COOKIE_SAMESITE = None
 
+# LOG相关配置
+LOG_TO_FILE = True
+LOG_PATH = "./logs/"
+LOG_FILENAME = "carbon-core.log"
+
+
+# 数据库配置
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
+        'NAME': 'carbon',
+        'USER': 'carbon',
+        'PASSWORD': '123456',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }

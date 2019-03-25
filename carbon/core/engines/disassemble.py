@@ -13,4 +13,19 @@
     :copyright: Copyright (c) 2017-2019 lightless. All rights reserved
 """
 
+from silex.engines.thread import ThreadEngine
 
+from carbon.utils.logger import logger
+
+
+class DisassembleEngine(ThreadEngine):
+    def __init__(self, app_ctx, name):
+        super(DisassembleEngine, self).__init__(app_ctx, name)
+
+    def _worker(self):
+        logger.info("{} start!".format(self.name))
+
+        while self.is_running():
+            self.ev.wait(1)
+
+        logger.info("{} stop!".format(self.name))
