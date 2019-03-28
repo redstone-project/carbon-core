@@ -15,10 +15,28 @@
 """
 from django.core.management import BaseCommand
 
+from carbon.application import CarbonApplication
+from carbon.core import global_data
+
 
 class Command(BaseCommand):
-
     help = "Start Carbon application"
 
     def handle(self, *args, **options):
-        pass
+        self.stdout.write(self.style.SUCCESS("Staring Carbon application..."))
+
+        # 初始化整个App class
+        global_data.carbon_application = CarbonApplication()
+
+        # 启动app
+        try:
+            global_data.carbon_application.run()
+        except Exception as e:
+            # 获取stack信息
+            import sys
+            import traceback
+
+            tbe = traceback.TracebackException(*sys.exc_info())
+            error_message = "".join(tbe.format())
+            self.stdout.write(
+                "Error while starting carbon application! Exception: {}\nDetails: \n{}".format(e, error_message))
