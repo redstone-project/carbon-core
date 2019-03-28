@@ -28,6 +28,15 @@ class CarbonTasksModel(CarbonBaseModel):
 
     job_id: 记录该task是属于哪一次扫描job的，一个job由多个task组成
     task_type: 任务类型，分为日常任务和普通任务
+        ONCE_PORT = 0x01
+        ONCE_SUB_DOMAIN = 0x02
+        ONCE_BRUTE_DIR = 0x03
+        ONCE_WEB_SPIDER = 0x04
+
+        DAILY_PORT = 0x11
+        DAILY_SUB_DOMAIN = 0x12
+        DAILY_BRUTE_DIR = 0x13
+        DAILY_WEB_SPIDER = 0x14
     payloads: 记录了待扫描的内容，不同的task_type具有不同的格式，但是均为JSON字符串，字段尽可能的保持一致
     status: task的状态
                 READY = 0x00        任务创建完成，等待开始

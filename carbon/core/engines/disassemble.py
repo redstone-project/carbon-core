@@ -16,6 +16,9 @@
 from silex.engines.thread import ThreadEngine
 
 from carbon.utils.logger import logger
+from carbon.db.models import CarbonJobsModel
+from carbon.db.constant import JobStatus
+from carbon.utils.target_parser import is_ip_target, is_url_target
 
 
 class DisassembleEngine(ThreadEngine):
@@ -26,6 +29,39 @@ class DisassembleEngine(ThreadEngine):
         logger.info("{} start!".format(self.name))
 
         while self.is_running():
-            self.ev.wait(1)
+
+            rows = CarbonJobsModel.instance.filter(status=JobStatus.READY).all()
+            if not rows:
+                self.ev.wait(1)
+                continue
+
+            for row in rows:
+                payloads = row.payloads
+                job_id = row.id
+                job_type = row.job_type
+                row.status = JobStatus.READY
+                row.save()
+                self.split_job(payloads, job_id, job_type)
 
         logger.info("{} stop!".format(self.name))
+
+    @staticmethod
+    def split_job(payloads, job_id, job_type):
+        """
+        将job切分成task
+        :param payloads:
+        :param job_id:
+        :param job_type:
+        :return:
+        """
+        payloads = payloads.replace("\r", "\n")
+        payloads = payloads.split("\n")
+
+        for target in payloads:
+            if is_url_target(target):
+                pass
+            elif is_ip_target(target):
+                pass
+            else:
+                logger.warning("Unknown parse target type, value: {}".format(target))
+

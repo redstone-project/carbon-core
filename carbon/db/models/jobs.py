@@ -20,7 +20,9 @@ from ._base import CarbonBaseModel
 
 
 class JobManager(models.Manager):
-    pass
+
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=0)
 
 
 class CarbonJobsModel(CarbonBaseModel):
@@ -37,9 +39,11 @@ class CarbonJobsModel(CarbonBaseModel):
     payloads: 用户输入的内容，一个目标一行，会自动产生多个task插入表中
     status: job的运行状态，日常任务除非手工停止，否则一直处于Running状态
             - 0x00 Ready
-            - 0x01 Running
-            - 0x02 Finished
-            - 0x03 Error
+            - 0x01 Prepare
+            - 0x02 Queue
+            - 0x03 Running
+            - 0x04 Finished
+            - 0x05 Error
     """
     class Meta:
         db_table = "carbon_jobs"
