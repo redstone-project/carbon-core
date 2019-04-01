@@ -16,8 +16,8 @@
 from silex.engines.thread import ThreadEngine
 
 from carbon.utils.logger import logger
-from carbon.db.models import CarbonJobsModel
-from carbon.db.constant import JobStatus
+from carbon.db.models import CarbonJobsModel, CarbonTasksModel
+from carbon.db.constant import JobStatus, JobType
 from carbon.utils.target_parser import is_ip_target, is_url_target
 
 
@@ -57,9 +57,19 @@ class DisassembleEngine(ThreadEngine):
         payloads = payloads.replace("\r", "\n")
         payloads = payloads.split("\n")
 
+        if job_type == JobType.ONCE:
+            task_type_prefix = "ONCE_"
+        elif job_type == JobType.DAILY:
+            task_type_prefix = "DAILY_"
+        else:
+            logger.error("Unknown job_type: {}".format(job_type))
+            return
+
         for target in payloads:
             if is_url_target(target):
-                pass
+                # CarbonTasksModel.instance.create_task(
+                #     job_id,
+                # )
             elif is_ip_target(target):
                 pass
             else:

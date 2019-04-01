@@ -13,3 +13,4 @@
 """
 
 from .jobs import CarbonJobsModel
+from .tasks import CarbonTasksModel

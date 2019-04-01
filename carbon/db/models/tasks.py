@@ -16,10 +16,25 @@
 from django.db import models
 
 from ._base import CarbonBaseModel
+from ..constant import TaskStatus
 
 
 class TasksManager(models.Manager):
-    pass
+
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=0)
+
+    def create_task(self, job_id, task_type, payloads):
+        """
+        创建一个新的任务
+        :param job_id:
+        :param task_type:
+        :param payloads:
+        :return:
+        """
+        return self.create(
+            job_id=job_id, task_type=task_type, payloads=payloads, status=TaskStatus.READY
+        )
 
 
 class CarbonTasksModel(CarbonBaseModel):
@@ -28,10 +43,11 @@ class CarbonTasksModel(CarbonBaseModel):
 
     job_id: 记录该task是属于哪一次扫描job的，一个job由多个task组成
     task_type: 任务类型，分为日常任务和普通任务
-        ONCE_PORT = 0x01
-        ONCE_SUB_DOMAIN = 0x02
-        ONCE_BRUTE_DIR = 0x03
-        ONCE_WEB_SPIDER = 0x04
+        ONCE_* = 0x0000 ~ 0x0999
+        ONCE_PORT = 0x0001
+        ONCE_SUB_DOMAIN = 0x0002
+        ONCE_BRUTE_DIR = 0x0003
+        ONCE_WEB_SPIDER = 0x0004
 
         DAILY_PORT = 0x11
         DAILY_SUB_DOMAIN = 0x12
