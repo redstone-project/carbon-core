@@ -15,6 +15,7 @@
 
 from silex.engines.thread import ThreadEngine
 
+from carbon.db.constant.job import JobScanTypes
 from carbon.utils.logger import logger
 from carbon.db.models import CarbonJobsModel, CarbonTasksModel
 from carbon.db.constant import JobStatus, JobType
@@ -39,23 +40,28 @@ class DisassembleEngine(ThreadEngine):
                 payloads = row.payloads
                 job_id = row.id
                 job_type = row.job_type
-                row.status = JobStatus.READY
+                scan_type = row.scan_types
+
+                row.status = JobStatus.PREPARE
                 row.save()
-                self.split_job(payloads, job_id, job_type)
+
+                self.split_job(payloads, job_id, job_type, scan_type)
 
         logger.info("{} stop!".format(self.name))
 
-    @staticmethod
-    def split_job(payloads, job_id, job_type):
+    def split_job(self, payloads, job_id, job_type, scan_type):
         """
         将job切分成task
         :param payloads:
         :param job_id:
         :param job_type:
+        :param scan_type:
         :return:
         """
         payloads = payloads.replace("\r", "\n")
         payloads = payloads.split("\n")
+
+        scan_types = scan_type.split(",")
 
         if job_type == JobType.ONCE:
             task_type_prefix = "ONCE_"
@@ -67,11 +73,27 @@ class DisassembleEngine(ThreadEngine):
 
         for target in payloads:
             if is_url_target(target):
-                # CarbonTasksModel.instance.create_task(
-                #     job_id,
-                # )
+                self.add_url_task(target)
+                pass
             elif is_ip_target(target):
                 pass
             else:
                 logger.warning("Unknown parse target type, value: {}".format(target))
 
+    def add_url_task(self, target, scan_types):
+        for scan_type in scan_types:
+            if scan_type == JobScanTypes.ATTACK:
+                pass
+            elif scan_type == JobScanTypes.PORT:
+                pass
+            elif scan_type == JobScanTypes.SPIDER:
+                pass
+            elif scan_type == JobScanTypes.BRUTE_DIR:
+                pass
+            elif scan_type == JobScanTypes.SUB_DOMAIN:
+                pass
+            else:
+                pass
+
+    def add_ip_task(self):
+        pass

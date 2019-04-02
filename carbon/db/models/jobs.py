@@ -36,6 +36,12 @@ class CarbonJobsModel(CarbonBaseModel):
     job_type: 作业类型，一次性任务、持续任务
                 - 一次性任务：只执行一次，用于正常扫描
                 - 日常任务：一旦完成扫描，马上产生一个相同的任务压入队列中
+    scan_types: 逗号分隔
+        - sub_domain 是否爆破子域名
+        - port 是否扫描端口
+        - spider 是否爬取更多链接
+        - attack 是否打payload
+        - brute_dir 是否爆破目录
     payloads: 用户输入的内容，一个目标一行，会自动产生多个task插入表中
     status: job的运行状态，日常任务除非手工停止，否则一直处于Running状态
             - 0x00 Ready
@@ -49,6 +55,7 @@ class CarbonJobsModel(CarbonBaseModel):
         db_table = "carbon_jobs"
 
     job_type = models.IntegerField(default=0)
+    scan_types = models.TextField()
     payloads = models.TextField()
     status = models.IntegerField(default=0)
 

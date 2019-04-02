@@ -39,3 +39,19 @@ class JobStatus:
     RUNNING = 0x03
     FINISHED = 0x04
     ERROR = 0x05
+
+
+class JobScanTypes:
+    """
+    scan_types: 逗号分隔
+        - sub_domain 是否爆破子域名
+        - port 是否扫描端口
+        - spider 是否爬取更多链接
+        - attack 是否打payload
+        - brute_dir 是否爆破目录
+    """
+    SUB_DOMAIN = "sub_domain"
+    PORT = "port"
+    SPIDER = "spider"
+    ATTACK = "attack"
+    BRUTE_DIR = "brute_dir"
