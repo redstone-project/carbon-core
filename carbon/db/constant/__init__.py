@@ -13,7 +13,7 @@
     :copyright: Copyright (c) 2017-2019 lightless. All rights reserved
 """
 
-from .job import JobType, JobStatus
+from .job import JobCycle, JobStatus
 from .task import TaskStatus, TaskType
 
 

@@ -15,10 +15,9 @@
 
 from silex.engines.thread import ThreadEngine
 
-from carbon.db.constant.job import JobScanTypes
-from carbon.utils.logger import logger
+from carbon.db.constant import JobStatus, TaskType
 from carbon.db.models import CarbonJobsModel, CarbonTasksModel
-from carbon.db.constant import JobStatus, JobType
+from carbon.utils.logger import logger
 from carbon.utils.target_parser import is_ip_target, is_url_target
 
 
@@ -39,61 +38,64 @@ class DisassembleEngine(ThreadEngine):
             for row in rows:
                 payloads = row.payloads
                 job_id = row.id
-                job_type = row.job_type
                 scan_type = row.scan_types
+                cycle = row.cycle
 
                 row.status = JobStatus.PREPARE
                 row.save()
 
-                self.split_job(payloads, job_id, job_type, scan_type)
+                self.split_job(payloads, job_id, cycle, scan_type)
 
         logger.info("{} stop!".format(self.name))
 
-    def split_job(self, payloads, job_id, job_type, scan_type):
+    def split_job(self, payloads, job_id, cycle, scan_types):
         """
         将job切分成task
         :param payloads:
         :param job_id:
-        :param job_type:
-        :param scan_type:
+        :param cycle:
+        :param scan_types:
         :return:
         """
+
+        # 将payload转换为list，并且去掉空串
         payloads = payloads.replace("\r", "\n")
         payloads = payloads.split("\n")
+        payloads.remove("")
 
-        scan_types = scan_type.split(",")
+        # 将job的扫描类型转换为list
+        scan_types = scan_types.split(",")
 
-        if job_type == JobType.ONCE:
-            task_type_prefix = "ONCE_"
-        elif job_type == JobType.DAILY:
-            task_type_prefix = "DAILY_"
-        else:
-            logger.error("Unknown job_type: {}".format(job_type))
-            return
-
-        for target in payloads:
-            if is_url_target(target):
-                self.add_url_task(target)
-                pass
-            elif is_ip_target(target):
-                pass
+        # 循环处理每个payload
+        for payload in payloads:
+            if is_ip_target(payload):
+                # 这里不需要考虑任务转换功能
+                self._add_task(payload, scan_types, job_id, cycle, "ip")
+            elif is_url_target(payload):
+                # 添加url类型的任务
+                self._add_task(payload, scan_types, job_id, cycle, "url")
             else:
-                logger.warning("Unknown parse target type, value: {}".format(target))
+                logger.warning("skipping unknown task: {}".format(payload))
+                continue
 
-    def add_url_task(self, target, scan_types):
-        for scan_type in scan_types:
-            if scan_type == JobScanTypes.ATTACK:
-                pass
-            elif scan_type == JobScanTypes.PORT:
-                pass
-            elif scan_type == JobScanTypes.SPIDER:
-                pass
-            elif scan_type == JobScanTypes.BRUTE_DIR:
-                pass
-            elif scan_type == JobScanTypes.SUB_DOMAIN:
-                pass
-            else:
-                pass
+    @staticmethod
+    def _add_task(payload, scan_types, job_id, cycle, _type):
 
-    def add_ip_task(self):
-        pass
+        _task_types = {
+            "ip": [
+                TaskType.PORT,
+                TaskType.ATTACK,
+            ],
+            "url": [
+                TaskType.SUB_DOMAIN,
+                TaskType.BRUTE_DIR,
+                TaskType.WEB_SPIDER,
+                TaskType.ATTACK,
+            ]
+        }
+
+        for st in scan_types:
+            if st in _task_types.get(_type, []):
+                CarbonTasksModel.instance.create_task(
+                    job_id, st, payload, cycle
+                )

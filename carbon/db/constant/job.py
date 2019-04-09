@@ -14,7 +14,7 @@
 """
 
 
-class JobType:
+class JobCycle:
     """
     jobs中的job_type字段使用
     ONCE: 一次性扫描任务

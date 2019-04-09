@@ -16,17 +16,13 @@
 
 class TaskType:
     """
-    task的类型，包括日常任务和一次性任务
+    task的类型
     """
-    ONCE_PORT = 0x01
-    ONCE_SUB_DOMAIN = 0x02
-    ONCE_BRUTE_DIR = 0x03
-    ONCE_WEB_SPIDER = 0x04
-
-    DAILY_PORT = 0x11
-    DAILY_SUB_DOMAIN = 0x12
-    DAILY_BRUTE_DIR = 0x13
-    DAILY_WEB_SPIDER = 0x14
+    PORT = 0x0001
+    SUB_DOMAIN = 0x0002
+    BRUTE_DIR = 0x0003
+    WEB_SPIDER = 0x0004
+    ATTACK = 0x0005
 
 
 class TaskStatus:

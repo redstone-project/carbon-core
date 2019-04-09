@@ -33,7 +33,8 @@ class CarbonJobsModel(CarbonBaseModel):
     周期性任务和持续任务共用另外一个任务队列
     保证一次性任务可以立即执行，另外的任务只有在空闲的情况下才会执行
 
-    job_type: 作业类型，一次性任务、持续任务
+    name: 作业名称，用于标识任务
+    cycle: 作业周期
                 - 一次性任务：只执行一次，用于正常扫描
                 - 日常任务：一旦完成扫描，马上产生一个相同的任务压入队列中
     scan_types: 逗号分隔
@@ -54,7 +55,8 @@ class CarbonJobsModel(CarbonBaseModel):
     class Meta:
         db_table = "carbon_jobs"
 
-    job_type = models.IntegerField(default=0)
+    name = models.CharField(max_length=128, default="unnamed job")
+    cycle = models.IntegerField(default=0)
     scan_types = models.TextField()
     payloads = models.TextField()
     status = models.IntegerField(default=0)
