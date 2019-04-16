@@ -13,18 +13,33 @@
     :copyright: Copyright (c) 2017-2019 lightless. All rights reserved
 """
 
+import typing
 
-class CarbonApplication(object):
+from silex.queue import RabbitQueue
+from django.conf import settings
+
+
+class CarbonMainApplication(object):
+    class QUEUES:
+        PORT_TASK_DAILY_QUEUE = None
+        PORT_TASK_ONCE_QUEUE = None
 
     def __init__(self):
-        super(CarbonApplication, self).__init__()
+        super(CarbonMainApplication, self).__init__()
+
+        # rabbit queue 的连接类
+        # 需要用到的时候通过get_new_channel获取新的channel使用
+        self.rabbit_queue: typing.Optional[RabbitQueue] = None
 
     def init(self):
         """
         初始化部分，初始化队列，engine等对象
         :return:
         """
-        pass
+        self.rabbit_queue = RabbitQueue()
+        self.rabbit_queue.connect(
+            settings.RABBIT_USERNAME, settings.RABBIT_PASSWORD, settings.RABBIT_HOST, settings.RABBIT_VHOST
+        )
 
     def run(self):
         """

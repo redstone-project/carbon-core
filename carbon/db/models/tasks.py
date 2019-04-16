@@ -38,6 +38,14 @@ class TasksManager(models.Manager):
             status=TaskStatus.READY, cycle=cycle
         )
 
+    def get_all_tasks_by_status(self, status):
+        """
+        根据状态获取该状态的全部task
+        :param status: 待查询的状态
+        :return:
+        """
+        return self.filter(status=status).all()
+
 
 class CarbonTasksModel(CarbonBaseModel):
     """

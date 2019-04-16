@@ -21,9 +21,9 @@ from carbon.utils.logger import logger
 from carbon.utils.target_parser import is_ip_target, is_url_target
 
 
-class DisassembleEngine(ThreadEngine):
+class SplitEngine(ThreadEngine):
     def __init__(self, app_ctx, name):
-        super(DisassembleEngine, self).__init__(app_ctx, name)
+        super(SplitEngine, self).__init__(app_ctx, name)
 
     def _worker(self):
         logger.info("{} start!".format(self.name))

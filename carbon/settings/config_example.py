@@ -14,7 +14,7 @@
 """
 
 DEBUG = True
-SECRET_KEY = ""     # 推荐使用该方法生成：base64.b64encode(os.urandom(32))
+SECRET_KEY = ""  # 推荐使用该方法生成：base64.b64encode(os.urandom(32))
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 CSRF_COOKIE_SAMESITE = None
 
@@ -22,7 +22,6 @@ CSRF_COOKIE_SAMESITE = None
 LOG_TO_FILE = True
 LOG_PATH = "./logs/"
 LOG_FILENAME = "carbon-core.log"
-
 
 # 数据库配置
 DATABASES = {
@@ -34,4 +33,21 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '5432',
     }
+}
+
+# RabbitMQ 队列相关配置
+RABBIT_VHOST = "/carbon"
+RABBIT_USERNAME = "carbon"
+RABBIT_PASSWORD = "carbon"
+RABBIT_HOST = "localhost"
+
+CYCLE_DAILY_SUFFIX = ".daily"
+CYCLE_ONCE_SUFFIX = ".once"
+
+RABBIT_QUEUES_NAME = {
+    "port_task": "task.port"
+}
+
+RABBIT_EXCHANGES_NAME = {
+    "task": "exchange.task"
 }
