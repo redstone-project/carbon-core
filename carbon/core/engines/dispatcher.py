@@ -87,6 +87,11 @@ class DispatcherEngine(ThreadEngine):
 
             # 将TASK放到队列中
             for _task in ready_tasks:
+
+                # TODO: 跳过attack的任务，需要在receiver的部分下发
+                # 现在先把所有的payload都打一遍
+                pass
+
                 # 拼出routing_key
                 routing_key = _task.build_routing_key()
 
