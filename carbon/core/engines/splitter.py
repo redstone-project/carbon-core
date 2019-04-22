@@ -79,7 +79,7 @@ class SplitEngine(ThreadEngine):
                 continue
 
     @staticmethod
-    def _add_task(payload, scan_types, job_id, cycle, _type):
+    def _add_task(target, scan_types, job_id, cycle, _type):
 
         _task_types = {
             "ip": [
@@ -97,5 +97,5 @@ class SplitEngine(ThreadEngine):
         for st in scan_types:
             if st in _task_types.get(_type, []):
                 CarbonTasksModel.instance.create_task(
-                    job_id, st, payload, cycle
+                    job_id, st, target, cycle
                 )

@@ -51,6 +51,7 @@ class CarbonJobsModel(CarbonBaseModel):
             - 0x03 Running
             - 0x04 Finished
             - 0x05 Error
+    priority: 优先级，默认为5, 总共 1-10
     """
     class Meta:
         db_table = "carbon_jobs"
@@ -60,6 +61,7 @@ class CarbonJobsModel(CarbonBaseModel):
     scan_types = models.TextField()
     payloads = models.TextField()
     status = models.IntegerField(default=0)
+    priority = models.PositiveSmallIntegerField(default=5)
 
     objects = models.Manager()
     instance = JobManager()

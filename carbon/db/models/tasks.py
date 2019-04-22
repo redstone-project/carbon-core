@@ -12,9 +12,12 @@
     :license:   GPL-3.0, see LICENSE for more details.
     :copyright: Copyright (c) 2017 lightless. All rights reserved
 """
+import json
+import typing
 
 from django.db import models
 
+from carbon.db.constant import JobCycle, TaskType
 from ._base import CarbonBaseModel
 from ..constant import TaskStatus
 
@@ -24,7 +27,7 @@ class TasksManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_deleted=0)
 
-    def create_task(self, job_id, task_type, payloads, cycle):
+    def create_task(self, job_id, task_type, target, cycle):
         """
         创建一个新的任务
         :param job_id:
@@ -34,7 +37,7 @@ class TasksManager(models.Manager):
         :return:
         """
         return self.create(
-            job_id=job_id, task_type=task_type, payloads=payloads,
+            job_id=job_id, task_type=task_type, target=target,
             status=TaskStatus.READY, cycle=cycle
         )
 
@@ -65,15 +68,60 @@ class CarbonTasksModel(CarbonBaseModel):
                 RUNNING = 0x01      任务执行中
                 FINISHED = 0x02     任务正常完成
                 ERROR = 0x03        任务异常退出
+    priority: 优先级，默认继承job的优先级，如果job没有或其他情况，默认为5，总范围1-10
     """
+
     class Meta:
         db_table = "carbon_tasks"
 
     job_id = models.BigIntegerField(default=0)
     task_type = models.CharField(max_length=64, db_index=True)
     cycle = models.IntegerField(default=0)
-    payloads = models.TextField()
+    target = models.TextField()
     status = models.IntegerField(default=0)
+    priority = models.SmallIntegerField(default=5)
 
     objects = models.Manager()
     instance = TasksManager()
+
+    def build_routing_key(self) -> typing.Optional[str]:
+        """
+        根据当前的row代表的task，生成routing_key
+        :return:
+        """
+
+        cycle_map = {
+            JobCycle.ONCE: "once",
+            JobCycle.DAILY: "daily",
+        }
+
+        task_type_map = {
+            TaskType.PORT: "port",
+            TaskType.WEB_SPIDER: "spider",
+            TaskType.SUB_DOMAIN: "subdomain",
+            TaskType.BRUTE_DIR: "brutedir",
+            TaskType.ATTACK: "attack",
+        }
+
+        p1 = cycle_map.get(self.cycle, None)
+        p2 = task_type_map.get(self.task_type, None)
+        if any([p1, p2]):
+            return None
+        else:
+            return "key.{}.{}".format(p1, p2)
+
+    def build_message_body(self) -> str:
+        """
+        生成当前task的json message
+        :return:
+        """
+
+        tmp_map = {
+            "job_id": self.job_id,
+            "task_type": self.task_type,
+            "cycle": self.cycle,
+            "target": self.target,
+            "priority": self.priority
+        }
+
+        return json.dumps(tmp_map)

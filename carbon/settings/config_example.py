@@ -44,8 +44,27 @@ RABBIT_HOST = "localhost"
 CYCLE_DAILY_SUFFIX = ".daily"
 CYCLE_ONCE_SUFFIX = ".once"
 
-RABBIT_QUEUES_NAME = {
-    "port_task": "task.port"
+RABBIT_QUEUES_INFO = {
+    "task_port": {
+        "name": "task.port",
+        "routing_key": "key.port"
+    },
+    "task_subdomain": {
+        "name": "task.subdomain",
+        "routing_key": "key.subdomain",
+    },
+    "task_brutedir": {
+        "name": "task.brutedir",
+        "routing_key": "key.brutedir",
+    },
+    "task_spider": {
+        "name": "task.spider",
+        "routing_key": "key.spider",
+    },
+    "task_attack": {
+        "name": "task.attack",
+        "routing_key": "key.attack",
+    }
 }
 
 RABBIT_EXCHANGES_NAME = {

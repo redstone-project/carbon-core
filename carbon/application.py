@@ -41,6 +41,11 @@ class CarbonMainApplication(object):
             settings.RABBIT_USERNAME, settings.RABBIT_PASSWORD, settings.RABBIT_HOST, settings.RABBIT_VHOST
         )
 
+        # 开始声明 exchange 和 queue, 如果已经存在了，则什么都不做
+        # channel = self.rabbit_queue.get_new_channel()
+        # channel.queue_declare(settings.RABBIT_QUEUES_NAME.get("port_task", "task.port"), durable=True)
+        # channel.queue_declare(settings.)
+
     def run(self):
         """
         启动所有的engine，程序的入口点
