@@ -44,7 +44,7 @@ RABBIT_HOST = "localhost"
 CYCLE_DAILY_SUFFIX = ".daily"
 CYCLE_ONCE_SUFFIX = ".once"
 
-RABBIT_QUEUES_INFO = {
+RABBIT_TASK_QUEUES_INFO = {
     "task_port": {
         "name": "task.port",
         "routing_key": "key.port"
@@ -67,6 +67,13 @@ RABBIT_QUEUES_INFO = {
     }
 }
 
-RABBIT_EXCHANGES_NAME = {
-    "task": "exchange.task"
+RABBIT_RESULT_QUEUES_INFO = {
+    "result": {
+        "name": "result",
+        "routing_key": "",
+    }
+}
+
+RABBIT_EXCHANGES = {
+    "task": "exchange.task",
 }

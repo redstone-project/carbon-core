@@ -52,29 +52,40 @@ class TestRabbitMQ(unittest.TestCase):
         channel.close()
         connection.close()
 
-    # def test_consumer(self):
-    #     credentials = pika.PlainCredentials("carbon", "carbon")
-    #     connection = pika.BlockingConnection(pika.ConnectionParameters(
-    #         host="localhost", virtual_host="carbon", credentials=credentials
-    #     ))
-    #     channel: BlockingChannel = connection.channel()
-    #     channel.exchange_declare(
-    #         exchange="topic_logs", exchange_type="topic"
-    #     )
-    #
-    #     result = channel.queue_declare(exclusive=True)
-    #     queue_name = result.method.queue
-    #     print("[*] queue name: {}".format(queue_name))
-    #
-    #     channel.queue_bind(
-    #         exchange="topic_logs", queue=queue_name, routing_key="daily.*"
-    #     )
-    #
-    #     def callback(ch, method, properties, body):
-    #         print("[x] {}:{}".format(method.routing_key, body))
-    #
-    #     channel.basic_consume(callback, queue=queue_name, no_ack=True)
-    #     channel.start_consuming()
+    def test_consumer(self):
+        credentials = pika.PlainCredentials("carbon", "carbon")
+        connection = pika.BlockingConnection(pika.ConnectionParameters(
+            host="localhost", virtual_host="carbon", credentials=credentials
+        ))
+        channel: BlockingChannel = connection.channel()
+        channel.exchange_declare(
+            exchange="topic_logs", exchange_type="topic"
+        )
+
+        result = channel.queue_declare(exclusive=True)
+        queue_name = result.method.queue
+        print("[*] queue name: {}".format(queue_name))
+
+        channel.queue_bind(
+            exchange="topic_logs", queue=queue_name, routing_key="daily.*"
+        )
+
+        def callback(ch, method, properties, body):
+            print("[x] {}:{}".format(method.routing_key, body))
+
+        channel.basic_consume(queue=queue_name, on_message_callback=callback)
+        channel.start_consuming()
+
+    def test_single_get(self):
+        credentials = pika.PlainCredentials("carbon", "carbon")
+        connection = pika.BlockingConnection(pika.ConnectionParameters(
+            host="172.17.0.2", virtual_host="/carbon", credentials=credentials
+        ))
+        channel: BlockingChannel = connection.channel()
+
+        # basic_get 方法，没有callback参数也ok
+        result = channel.basic_get("test_queue")
+        print(result)
 
 
 if __name__ == '__main__':

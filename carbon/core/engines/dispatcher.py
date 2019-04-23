@@ -43,14 +43,14 @@ class DispatcherEngine(ThreadEngine):
         # 定义exchange，如果已经有了则啥都不做
         # durable：设置是否持久化，保证服务器重启交换器不会丢失
         logger.debug("declare exchange...")
-        self.task_exchange = settings.RABBIT_EXCHANGES_NAME.get("task")
+        self.task_exchange = settings.RABBIT_EXCHANGES.get("task")
         channel.exchange_declare(
             exchange=self.task_exchange, exchange_type="direct", durable=True
         )
 
         logger.debug("declare queue...")
         # 定义任务队列，如果队列已经存在了，则什么都不做
-        queues = settings.RABBIT_QUEUES_INFO
+        queues = settings.RABBIT_TASK_QUEUES_INFO
         for k, queue_info in queues:
             # 声明 queue
             queue_name = queue_info.get("name")
@@ -76,6 +76,7 @@ class DispatcherEngine(ThreadEngine):
 
         # 初始化channel
         channel: BlockingChannel = self.init_new_channel()
+        logger.debug("channel id: {}", id(channel))
 
         while self.is_running():
             # 从数据库中取出所有的READY状态的TASK
